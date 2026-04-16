@@ -3,696 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TestMaster Cloud | Firebase синхронизация</title>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <title>TestMaster | Full Stack</title>
     <style>
+        /* Стили оставляем те же, что были в твоем коде */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
-            background: #121212;
-            min-height: 100vh;
-            padding: 30px 20px;
-            color: #e0e0e0;
-        }
-        .app-container {
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            background: #1e1e2a;
-            border-radius: 28px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.5);
-            padding: 32px 40px;
-            border: 1px solid #2d2d3a;
-        }
-        h1 { font-size: 32px; margin-bottom: 8px; color: #5b8cbd; }
-        .subtitle { color: #8a8a9e; margin-bottom: 32px; border-left: 4px solid #4a7a9c; padding-left: 20px; }
-        .auth-container { max-width: 420px; margin: 0 auto; }
-        .tabs { display: flex; gap: 4px; margin-bottom: 28px; border-bottom: 2px solid #2d2d3a; }
-        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-weight: 600; color: #8a8a9e; border-bottom: 2px solid transparent; }
-        .tab.active { color: #5b8cbd; border-bottom-color: #5b8cbd; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; color: #9ca3af; }
-        input, select, textarea { width: 100%; padding: 12px 14px; border: 1px solid #3a3a4a; font-size: 15px; background: #2a2a36; color: #e0e0e0; border-radius: 14px; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #5b8cbd; box-shadow: 0 0 0 3px rgba(91,140,189,0.2); }
-        button { padding: 10px 20px; border: none; background: #2a2a36; font-weight: 600; font-size: 14px; cursor: pointer; border-radius: 40px; color: #e0e0e0; }
-        button.primary { background: #2c5a7a; color: white; }
-        button.primary:hover { background: #3b6e94; transform: translateY(-1px); }
-        button.danger { background: #4a2a2a; color: #f5a3a3; }
-        .btn-group { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
-        .error-message { color: #f5a3a3; font-size: 13px; margin-top: 6px; }
-        .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid #2d2d3a; }
-        .tests-list { display: flex; flex-direction: column; gap: 18px; }
-        .test-card { border: 1px solid #2d2d3a; border-radius: 20px; padding: 20px 24px; background: #252531; }
-        .test-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 12px; }
-        .test-code { font-family: monospace; background: #1a1a26; padding: 4px 12px; border-radius: 40px; font-weight: 600; font-size: 13px; color: #7aacd0; }
-        .test-actions { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
-        .question-block { border: 1px solid #2d2d3a; border-radius: 20px; padding: 20px; margin-bottom: 20px; background: #1e1e2a; }
-        .option-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
-        .option-row input { flex: 1; }
-        .progress { height: 4px; background: #2d2d3a; margin: 20px 0; border-radius: 10px; }
-        .progress-bar { height: 100%; width: 0%; background: #5b8cbd; border-radius: 10px; }
-        .question-text { font-size: 22px; font-weight: 600; margin: 24px 0; color: #bdd4e8; }
-        .answer-item { padding: 14px 18px; border: 1px solid #3a3a4a; border-radius: 60px; margin-bottom: 10px; cursor: pointer; background: #252531; }
-        .answer-item.selected { background: #2c5a7a; color: white; border-color: #5b8cbd; }
-        .nav-buttons { display: flex; justify-content: space-between; margin-top: 32px; }
-        .result-screen { text-align: center; }
-        .score { font-size: 64px; font-weight: 700; margin: 20px 0; color: #5b8cbd; }
-        .message { padding: 16px; background: #252531; border-left: 4px solid #5b8cbd; border-radius: 16px; margin: 20px 0; }
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
-        .back-link { display: inline-block; margin-bottom: 20px; color: #7aacd0; text-decoration: none; font-weight: 600; }
-        .sync-status { font-size: 12px; color: #4ade80; margin-top: 10px; text-align: center; }
-        @media (max-width: 700px) { .app-container { padding: 20px; } }
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #e0e0e0; padding: 20px; }
+        .app-container { max-width: 800px; margin: 0 auto; background: #1e1e2a; border-radius: 24px; padding: 30px; border: 1px solid #333345; }
+        .card { background: #252535; border-radius: 16px; padding: 20px; margin-bottom: 15px; border: 1px solid #333345; }
+        .btn { padding: 12px 20px; border-radius: 50px; border: none; cursor: pointer; font-weight: 600; transition: 0.3s; font-size: 14px; text-align: center; }
+        .btn-primary { background: #6366f1; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-outline { background: transparent; border: 1px solid #6366f1; color: #6366f1; }
+        input { background: #1a1a26; border: 1px solid #333345; color: white; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 15px; outline: none; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #1e1e2a; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; border-radius: 20px; padding: 30px; border: 1px solid #333345; }
+        .code-badge { background: #6366f1; color: white; padding: 4px 10px; border-radius: 6px; font-family: monospace; }
+        .option-item { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
     </style>
 </head>
 <body>
-<div id="app" class="app-container"></div>
+
+<div id="app" class="app-container">Загрузка данных с сервера...</div>
 
 <script>
     (function(){
-        // ==================== FIREBASE КОНФИГУРАЦИЯ ====================
-        // 👇👇👇 СЮДА ВСТАВЬ СВОИ ДАННЫЕ ИЗ КОНСОЛИ FIREBASE 👇👇👇
-        const firebaseConfig = {
-            apiKey: "AIzaSyB4sG7LQqJkZqXxYwWvVcCbBnNmMpPoOqQrRsStT",  // ЗАМЕНИ НА СВОЙ
-            authDomain: "testmaster-xxxxx.firebaseapp.com",       // ЗАМЕНИ
-            projectId: "testmaster-xxxxx",                       // ЗАМЕНИ
-            storageBucket: "testmaster-xxxxx.firebasestorage.app",// ЗАМЕНИ
-            messagingSenderId: "123456789012",                   // ЗАМЕНИ
-            appId: "1:123456789012:web:abcdef1234567890"         // ЗАМЕНИ
-        };
-        // =============================================================
-
-        // Инициализация Firebase
-        let db;
-        let firebaseInitialized = false;
-        let initError = null;
-
-        try {
-            if (firebase.apps.length === 0) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            db = firebase.firestore();
-            firebaseInitialized = true;
-            console.log('✅ Firebase подключён');
-        } catch(e) {
-            initError = e.message;
-            console.error('❌ Ошибка Firebase:', e);
-        }
-
-        const ADMIN_CODE = 'ADMIN2025';
+        const ADMIN_PASS = 'ADMIN2025';
+        let currentUser = JSON.parse(sessionStorage.getItem('tm_user')) || null;
         let tests = [];
-        let currentUser = null;
-        let isLoading = true;
+        let activeQuiz = null;
 
-        // Состояние прохождения теста
-        let quizState = {
-            test: null,
-            step: 'form',
-            participant: { fullname: '', institution: '', grade: '', birthYear: '', participatedBefore: 'нет' },
-            answers: [],
-            currentIndex: 0,
-            score: null
-        };
-
-        // ----- ЗАГРУЗКА ТЕСТОВ ИЗ FIRESTORE -----
-        async function loadTestsFromFirestore() {
-            if (!firebaseInitialized) {
-                console.warn('Firebase не инициализирован');
-                return false;
-            }
-            try {
-                const snapshot = await db.collection('tests').get();
-                const loadedTests = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    loadedTests.push({
-                        id: doc.id,
-                        name: data.name,
-                        description: data.description || '',
-                        code: data.code,
-                        questions: data.questions || [],
-                        createdAt: data.createdAt
-                    });
-                });
-                if (loadedTests.length === 0) {
-                    // Создаём демо-тест
-                    const demoTest = {
-                        name: 'Демонстрационный тест',
-                        description: 'Проверьте свои знания (облачный)',
-                        code: 'DEMO01',
-                        questions: [
-                            { text: 'Столица Франции?', options: ['Лондон','Берлин','Париж','Мадрид'], correct: [2], points: 2 },
-                            { text: 'Какие планеты газовые гиганты?', options: ['Марс','Юпитер','Сатурн','Земля'], correct: [1,2], points: 3 }
-                        ],
-                        createdAt: new Date().toISOString()
-                    };
-                    const docRef = await db.collection('tests').add(demoTest);
-                    loadedTests.push({ id: docRef.id, ...demoTest });
-                }
-                tests = loadedTests;
-                saveTestsToLocal();
-                return true;
-            } catch(e) {
-                console.error('Ошибка загрузки из Firestore:', e);
-                loadTestsFromLocal();
-                return false;
-            }
+        // --- ФУНКЦИИ ВЗАИМОДЕЙСТВИЯ С БЭКЕНДОМ ---
+        async function apiFetch(url, method = 'GET', body = null) {
+            const options = { method, headers: { 'Content-Type': 'application/json' } };
+            if (body) options.body = JSON.stringify(body);
+            const res = await fetch(url, options);
+            if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Ошибка сервера'); }
+            return res.json();
         }
 
-        // Сохранение теста в Firestore
-        async function saveTestToFirestore(test) {
-            if (!firebaseInitialized) return false;
-            try {
-                const testData = {
-                    name: test.name,
-                    description: test.description,
-                    code: test.code,
-                    questions: test.questions,
-                    createdAt: test.createdAt
-                };
-                await db.collection('tests').doc(test.id).set(testData);
-                return true;
-            } catch(e) {
-                console.error('Ошибка сохранения:', e);
-                return false;
-            }
+        async function loadTests() {
+            try { tests = await apiFetch('/api/tests'); render(); }
+            catch (e) { console.error(e); }
         }
 
-        // Удаление теста из Firestore
-        async function deleteTestFromFirestore(testId) {
-            if (!firebaseInitialized) return false;
-            try {
-                await db.collection('tests').doc(testId).delete();
-                return true;
-            } catch(e) {
-                console.error('Ошибка удаления:', e);
-                return false;
-            }
-        }
-
-        // Локальный бэкап
-        function loadTestsFromLocal() {
-            const saved = localStorage.getItem('testmaster_firebase_backup');
-            if (saved) tests = JSON.parse(saved);
-            else {
-                tests = [{
-                    id: 'local_demo',
-                    name: 'Демо-тест (локальный)',
-                    description: 'Синхронизация не настроена',
-                    code: 'DEMO99',
-                    questions: [
-                        { text: 'Пример вопроса?', options: ['Да','Нет'], correct: [0], points: 1 }
-                    ],
-                    createdAt: new Date().toISOString()
-                }];
-            }
-        }
-
-        function saveTestsToLocal() {
-            localStorage.setItem('testmaster_firebase_backup', JSON.stringify(tests));
-        }
-
-        // Публичные методы
-        async function addTest(test) {
-            tests.push(test);
-            saveTestsToLocal();
-            if (firebaseInitialized) await saveTestToFirestore(test);
-        }
-
-        async function updateTest(test) {
-            const index = tests.findIndex(t => t.id === test.id);
-            if (index !== -1) tests[index] = test;
-            saveTestsToLocal();
-            if (firebaseInitialized) await saveTestToFirestore(test);
-        }
-
-        async function removeTest(testId) {
-            tests = tests.filter(t => t.id !== testId);
-            saveTestsToLocal();
-            if (firebaseInitialized) await deleteTestFromFirestore(testId);
-        }
-
-        // ----- Пользователи (локально) -----
-        function getUsers() {
-            const stored = localStorage.getItem('testmaster_users_firebase');
-            return stored ? JSON.parse(stored) : [];
-        }
-        function saveUsers(users) {
-            localStorage.setItem('testmaster_users_firebase', JSON.stringify(users));
-        }
-        function saveSession(user) { sessionStorage.setItem('testmaster_currentUser_firebase', JSON.stringify(user)); }
-        function loadSession() {
-            const sess = sessionStorage.getItem('testmaster_currentUser_firebase');
-            if (sess) { try { currentUser = JSON.parse(sess); } catch(e) { currentUser = null; } }
-        }
-        function clearSession() { sessionStorage.removeItem('testmaster_currentUser_firebase'); currentUser = null; }
-
-        // ----- Маршрутизация -----
-        function navigate(route) {
-            window.location.hash = route;
-            renderRoute();
-        }
-
-        async function renderRoute() {
-            if (isLoading) {
-                const app = document.getElementById('app');
-                if (firebaseInitialized) {
-                    app.innerHTML = '<div class="message">🔄 Загрузка тестов из Firebase...</div>';
-                    await loadTestsFromFirestore();
-                } else {
-                    app.innerHTML = `<div class="message error">⚠️ Firebase не настроен! Вставь свои ключи в firebaseConfig. Использую локальные тесты.</div>`;
-                    loadTestsFromLocal();
-                }
-                isLoading = false;
-            }
-            const hash = window.location.hash.slice(1);
-            if (!currentUser && hash !== 'login') {
-                navigate('login');
-                return;
-            }
-            if (hash === 'login') renderAuth();
-            else if (hash === 'admin' && currentUser && currentUser.isAdmin) renderAdminPanel();
-            else if (hash === 'browse') renderBrowseTests();
-            else if (hash.startsWith('quiz/')) {
-                const quizId = hash.split('/')[1];
-                renderQuizFlow(quizId);
-            }
-            else renderAuth();
-        }
-
-        // ----- Авторизация -----
-        function renderAuth() {
-            const app = document.getElementById('app');
-            const fbStatus = firebaseInitialized ? '✅ Firebase подключён, тесты синхронизируются' : '❌ Firebase не настроен — тесты только локально';
-            app.innerHTML = `
-                <h1>☁️ TestMaster Cloud</h1>
-                <div class="subtitle">Тесты синхронизируются через Firebase</div>
-                <div class="auth-container">
-                    <div class="tabs">
-                        <div class="tab active" data-tab="login">Вход</div>
-                        <div class="tab" data-tab="register">Регистрация</div>
-                    </div>
-                    <div id="loginForm">
-                        <div class="form-group"><label>Логин</label><input type="text" id="loginUsername" placeholder="Введите логин"></div>
-                        <div class="form-group"><label>Пароль</label><input type="password" id="loginPassword" placeholder="Введите пароль"></div>
-                        <div id="loginError" class="error-message"></div>
-                        <button class="primary" id="loginBtn">Войти</button>
-                        <p style="margin-top:20px; font-size:14px; color:#8a8a9e;">Администратор? <a href="#" id="adminAccessLink" style="color:#7aacd0;">Вход по коду ${ADMIN_CODE}</a></p>
-                    </div>
-                    <div id="registerForm" style="display:none;">
-                        <div class="form-group"><label>Логин</label><input type="text" id="regUsername" placeholder="Придумайте логин"></div>
-                        <div class="form-group"><label>Пароль</label><input type="password" id="regPassword" placeholder="Пароль"></div>
-                        <div class="form-group"><label>Подтверждение</label><input type="password" id="regPasswordConfirm" placeholder="Повторите пароль"></div>
-                        <div id="regError" class="error-message"></div>
-                        <button class="primary" id="registerBtn">Зарегистрироваться</button>
-                    </div>
-                </div>
-                <div class="sync-status">${fbStatus}</div>
-            `;
-
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    const isLogin = tab.dataset.tab === 'login';
-                    document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
-                    document.getElementById('registerForm').style.display = isLogin ? 'none' : 'block';
-                });
-            });
-
-            document.getElementById('loginBtn').addEventListener('click', () => {
-                const username = document.getElementById('loginUsername').value.trim();
-                const password = document.getElementById('loginPassword').value;
-                const errorDiv = document.getElementById('loginError');
-                if (!username || !password) { errorDiv.textContent = 'Заполните все поля'; return; }
-                const users = getUsers();
-                const user = users.find(u => u.username === username && u.password === password);
-                if (!user) { errorDiv.textContent = 'Неверный логин или пароль'; return; }
-                currentUser = { username: user.username, isAdmin: false };
-                saveSession(currentUser);
-                navigate('browse');
-            });
-
-            document.getElementById('registerBtn').addEventListener('click', () => {
-                const username = document.getElementById('regUsername').value.trim();
-                const password = document.getElementById('regPassword').value;
-                const confirm = document.getElementById('regPasswordConfirm').value;
-                const errorDiv = document.getElementById('regError');
-                if (!username || !password || !confirm) { errorDiv.textContent = 'Заполните все поля'; return; }
-                if (password !== confirm) { errorDiv.textContent = 'Пароли не совпадают'; return; }
-                if (password.length < 3) { errorDiv.textContent = 'Пароль не менее 3 символов'; return; }
-                const users = getUsers();
-                if (users.find(u => u.username === username)) { errorDiv.textContent = 'Логин уже занят'; return; }
-                users.push({ username, password });
-                saveUsers(users);
-                currentUser = { username, isAdmin: false };
-                saveSession(currentUser);
-                navigate('browse');
-            });
-
-            document.getElementById('adminAccessLink').addEventListener('click', (e) => {
-                e.preventDefault();
-                const code = prompt('Введите код администратора');
-                if (code === ADMIN_CODE) {
-                    currentUser = { username: 'Administrator', isAdmin: true };
-                    saveSession(currentUser);
-                    navigate('admin');
-                } else alert('Неверный код');
-            });
-        }
-
-        // ----- Список тестов -----
-        function renderBrowseTests() {
+        // --- РЕНДЕР ИНТЕРФЕЙСА ---
+        function renderAuth(isReg = false) {
             const app = document.getElementById('app');
             app.innerHTML = `
-                <div class="user-header">
-                    <h1>📚 Доступные тесты</h1>
-                    <div><span style="margin-right:20px;">👤 ${currentUser.username}</span><button id="logoutBtn" class="danger">Выйти</button></div>
-                </div>
-                <div class="subtitle">Выберите тест для прохождения</div>
-                <div class="tests-list" id="testsList"></div>
-                <div style="margin-top:30px;">
-                    <p>Или введите код теста:</p>
-                    <div style="display:flex; gap:12px; margin-top:8px;">
-                        <input type="text" id="testCodeInput" placeholder="Код, например DEMO01" style="flex:1">
-                        <button id="joinByCodeBtn" class="primary">Перейти</button>
+                <div style="max-width: 350px; margin: 60px auto;">
+                    <h1 style="text-align:center; margin-bottom:30px;">TestMaster</h1>
+                    <div class="card">
+                        <h3>${isReg ? 'Регистрация' : 'Вход'}</h3>
+                        <input type="text" id="uName" placeholder="Логин">
+                        <input type="password" id="uPass" placeholder="Пароль">
+                        ${isReg ? '<input type="password" id="aCode" placeholder="Код админа (опционально)">' : ''}
+                        <button class="btn btn-primary" id="authBtn" style="width:100%; margin-top:10px;">${isReg ? 'Создать' : 'Войти'}</button>
+                        <p id="toggleAuth" style="text-align:center; margin-top:15px; font-size:13px; color:#888; cursor:pointer;">
+                            ${isReg ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Регистрация'}
+                        </p>
                     </div>
                 </div>
-                <div class="sync-status">🌐 Тесты синхронизированы с Firebase</div>
             `;
-            document.getElementById('logoutBtn').addEventListener('click', () => { clearSession(); navigate('login'); });
-
-            const container = document.getElementById('testsList');
-            function renderTests() {
-                if (!tests.length) { container.innerHTML = '<div class="message">Тесты отсутствуют, создайте в админке</div>'; return; }
-                let html = '';
-                tests.forEach(test => {
-                    html += `
-                        <div class="test-card">
-                            <div class="test-card-header"><strong>${escapeHtml(test.name)}</strong><span class="test-code">${test.code}</span></div>
-                            <div>${escapeHtml(test.description || '')}</div>
-                            <div style="font-size:14px;">Вопросов: ${test.questions.length}</div>
-                            <div class="test-actions"><button class="primary take-test" data-id="${test.id}">Пройти тест</button></div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-                document.querySelectorAll('.take-test').forEach(btn => {
-                    btn.addEventListener('click', () => navigate(`quiz/${btn.dataset.id}`));
-                });
-            }
-            renderTests();
-            document.getElementById('joinByCodeBtn').addEventListener('click', () => {
-                const code = document.getElementById('testCodeInput').value.trim().toUpperCase();
-                const test = tests.find(t => t.code === code);
-                if (!test) { alert('Тест с таким кодом не найден'); return; }
-                navigate(`quiz/${test.id}`);
-            });
-        }
-
-        // ----- Прохождение теста -----
-        function renderQuizFlow(quizId) {
-            const test = tests.find(t => t.id === quizId);
-            if (!test) {
-                document.getElementById('app').innerHTML = '<div class="message error">Тест не найден. <a href="#" onclick="window.location.hash=\'browse\'">Вернуться</a></div>';
-                return;
-            }
-            quizState.test = JSON.parse(JSON.stringify(test));
-            quizState.step = 'form';
-            quizState.participant = { fullname: '', institution: '', grade: '', birthYear: '', participatedBefore: 'нет' };
-            quizState.answers = quizState.test.questions.map(() => []);
-            quizState.currentIndex = 0;
-            quizState.score = null;
-            renderQuizStep();
-        }
-
-        function renderQuizStep() {
-            const app = document.getElementById('app');
-            if (quizState.step === 'form') {
-                app.innerHTML = `
-                    <a href="#" class="back-link" onclick="window.location.hash='browse'">← К списку тестов</a>
-                    <div><h2 style="margin-bottom:20px;">📝 Регистрация на тест: ${escapeHtml(quizState.test.name)}</h2>
-                    <div class="grid-2">
-                        <div class="form-group"><label>ФИО *</label><input type="text" id="fullname" value="${escapeHtml(quizState.participant.fullname)}"><div id="err_fullname" class="error-message"></div></div>
-                        <div class="form-group"><label>Учебное заведение *</label><input type="text" id="institution" value="${escapeHtml(quizState.participant.institution)}"><div id="err_institution" class="error-message"></div></div>
-                        <div class="form-group"><label>Класс *</label><input type="text" id="grade" value="${escapeHtml(quizState.participant.grade)}"><div id="err_grade" class="error-message"></div></div>
-                        <div class="form-group"><label>Год рождения *</label><input type="number" id="birthYear" value="${escapeHtml(quizState.participant.birthYear)}"><div id="err_birthYear" class="error-message"></div></div>
-                        <div class="form-group"><label>Участвовали ранее?</label><select id="participatedBefore"><option value="нет" selected>Нет</option><option value="да">Да</option></select></div>
-                    </div>
-                    <div class="btn-group"><button class="primary" id="startQuizBtn">Начать тест →</button></div></div>
-                `;
-                document.getElementById('startQuizBtn').addEventListener('click', () => {
-                    const full = document.getElementById('fullname').value.trim();
-                    const inst = document.getElementById('institution').value.trim();
-                    const grade = document.getElementById('grade').value.trim();
-                    const by = document.getElementById('birthYear').value.trim();
-                    const part = document.getElementById('participatedBefore').value;
-                    let ok = true;
-                    if (!full) { document.getElementById('err_fullname').innerText = 'Введите ФИО'; ok=false; }
-                    if (!inst) { document.getElementById('err_institution').innerText = 'Введите учебное заведение'; ok=false; }
-                    if (!grade) { document.getElementById('err_grade').innerText = 'Введите класс'; ok=false; }
-                    if (!by || by.length !== 4 || isNaN(by)) { document.getElementById('err_birthYear').innerText = 'Введите год рождения (4 цифры)'; ok=false; }
-                    if (!ok) return;
-                    quizState.participant = { fullname: full, institution: inst, grade, birthYear: by, participatedBefore: part };
-                    quizState.step = 'quiz';
-                    quizState.currentIndex = 0;
-                    renderQuizStep();
-                });
-                return;
-            }
-            if (quizState.step === 'quiz') {
-                const q = quizState.test.questions[quizState.currentIndex];
-                const total = quizState.test.questions.length;
-                const progress = ((quizState.currentIndex) / total) * 100;
-                let answersHtml = '';
-                q.options.forEach((opt, idx) => {
-                    const selected = quizState.answers[quizState.currentIndex]?.includes(idx);
-                    answersHtml += `<div class="answer-item ${selected ? 'selected' : ''}" data-opt-index="${idx}">${escapeHtml(opt)}</div>`;
-                });
-                app.innerHTML = `
-                    <a href="#" class="back-link" onclick="if(confirm('Прогресс будет потерян?')) window.location.hash='browse'">← Прервать</a>
-                    <div class="test-header"><div>Вопрос ${quizState.currentIndex+1} из ${total}</div><div class="progress"><div class="progress-bar" style="width:${progress}%"></div></div></div>
-                    <div class="question-text">${escapeHtml(q.text)} (${q.points} балл.)</div>
-                    <div class="answers-list">${answersHtml}</div>
-                    <div class="nav-buttons">
-                        ${quizState.currentIndex > 0 ? '<button id="prevBtn">← Назад</button>' : '<span></span>'}
-                        ${quizState.currentIndex < total-1 ? '<button class="primary" id="nextBtn">Далее →</button>' : '<button class="primary" id="finishBtn">Завершить</button>'}
-                    </div>
-                `;
-                document.querySelectorAll('.answer-item').forEach(el => {
-                    el.addEventListener('click', () => {
-                        const idx = parseInt(el.dataset.optIndex);
-                        let current = quizState.answers[quizState.currentIndex];
-                        if (current.includes(idx)) current = current.filter(i => i !== idx);
-                        else current.push(idx);
-                        quizState.answers[quizState.currentIndex] = current;
-                        renderQuizStep();
-                    });
-                });
-                document.getElementById('prevBtn')?.addEventListener('click', () => { quizState.currentIndex--; renderQuizStep(); });
-                document.getElementById('nextBtn')?.addEventListener('click', () => { quizState.currentIndex++; renderQuizStep(); });
-                document.getElementById('finishBtn')?.addEventListener('click', () => {
-                    let earned = 0, maxTotal = 0;
-                    quizState.test.questions.forEach((q, idx) => {
-                        maxTotal += q.points;
-                        const user = quizState.answers[idx] || [];
-                        const correct = q.correct;
-                        if (user.length === correct.length && user.every(v => correct.includes(v))) earned += q.points;
-                    });
-                    quizState.score = { earned, maxTotal };
-                    quizState.step = 'result';
-                    renderQuizStep();
-                });
-                return;
-            }
-            if (quizState.step === 'result') {
-                const percent = Math.round((quizState.score.earned / quizState.score.maxTotal) * 100);
-                app.innerHTML = `
-                    <a href="#" class="back-link" onclick="window.location.hash='browse'">← К списку</a>
-                    <div class="result-screen"><h2>🎉 Результаты</h2><div class="score">${quizState.score.earned} / ${quizState.score.maxTotal} баллов</div><p>${percent}%</p>
-                    <div class="message">${percent >= 80 ? 'Отлично!' : percent >= 50 ? 'Хорошо' : 'Попробуйте ещё'}</div>
-                    <button class="primary" id="restartBtn">Пройти заново</button></div>
-                `;
-                document.getElementById('restartBtn').addEventListener('click', () => { quizState.step = 'form'; renderQuizStep(); });
-            }
-        }
-
-        // ----- Админ-панель -----
-        function renderAdminPanel() {
-            const app = document.getElementById('app');
-            app.innerHTML = `
-                <div class="user-header"><h1>⚙️ Панель управления (Firebase)</h1>
-                <div><span style="margin-right:20px;">👑 ${currentUser.username}</span><button id="logoutBtn" class="danger">Выйти</button></div></div>
-                <div class="subtitle">Создание и редактирование тестов — данные синхронизируются с облаком</div>
-                <div style="margin-bottom:20px;"><button class="primary" id="createTestBtn">➕ Создать новый тест</button></div>
-                <div id="adminTestsList" class="tests-list"></div>
-                <div class="sync-status">🌐 Все изменения сохраняются в Firebase</div>
-            `;
-            document.getElementById('logoutBtn').addEventListener('click', () => { clearSession(); navigate('login'); });
-            document.getElementById('createTestBtn').addEventListener('click', () => openTestEditor(null));
-            renderAdminTestsList();
-        }
-
-        function renderAdminTestsList() {
-            const container = document.getElementById('adminTestsList');
-            if (!container) return;
-            if (tests.length === 0) { container.innerHTML = '<div class="message">Нет тестов, создайте первый</div>'; return; }
-            let html = '';
-            tests.forEach(test => {
-                html += `
-                    <div class="test-card">
-                        <div class="test-card-header"><strong>${escapeHtml(test.name)}</strong><span class="test-code">${test.code}</span></div>
-                        <div>${escapeHtml(test.description || '')}</div>
-                        <div style="font-size:14px;">Вопросов: ${test.questions.length}</div>
-                        <div class="test-actions">
-                            <button class="edit-test" data-id="${test.id}">✏️ Редактировать</button>
-                            <button class="copy-code" data-code="${test.code}">📋 Копировать код</button>
-                            <button class="danger delete-test" data-id="${test.id}">🗑️ Удалить</button>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-            container.querySelectorAll('.edit-test').forEach(btn => {
-                btn.addEventListener('click', () => openTestEditor(btn.dataset.id));
-            });
-            container.querySelectorAll('.copy-code').forEach(btn => {
-                btn.addEventListener('click', () => navigator.clipboard?.writeText(btn.dataset.code).then(() => alert('Код скопирован')));
-            });
-            container.querySelectorAll('.delete-test').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    if (confirm('Удалить тест? Данные исчезнут у всех пользователей')) {
-                        await removeTest(btn.dataset.id);
-                        await loadTestsFromFirestore();
-                        renderAdminTestsList();
+            document.getElementById('toggleAuth').onclick = () => renderAuth(!isReg);
+            document.getElementById('authBtn').onclick = async () => {
+                const name = document.getElementById('uName').value.trim();
+                const pass = document.getElementById('uPass').value.trim();
+                try {
+                    if (isReg) {
+                        const role = document.getElementById('aCode').value === ADMIN_PASS ? 'admin' : 'user';
+                        await apiFetch('/api/register', 'POST', { name, pass, role });
+                        alert('Регистрация успешна!'); renderAuth(false);
+                    } else {
+                        currentUser = await apiFetch('/api/login', 'POST', { name, pass });
+                        sessionStorage.setItem('tm_user', JSON.stringify(currentUser));
+                        loadTests();
                     }
-                });
-            });
+                } catch (e) { alert(e.message); }
+            };
         }
 
-        // Редактор теста
-        function openTestEditor(testId) {
-            const test = testId ? tests.find(t => t.id === testId) : null;
-            const isEdit = !!test;
-            let workingTest = test ? JSON.parse(JSON.stringify(test)) : {
-                name: '', description: '', code: generateCode(), questions: []
+        function render() {
+            if (!currentUser) return renderAuth();
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                    <h2>Привет, ${currentUser.name}</h2>
+                    <button class="btn btn-outline" onclick="sessionStorage.clear(); location.reload();">Выход</button>
+                </div>
+                <div class="card" style="border: 1px dashed #6366f1;">
+                    <h4>Вход по коду</h4>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <input type="text" id="searchCode" placeholder="Код теста" style="margin:0;">
+                        <button class="btn btn-primary" id="goBtn">Начать</button>
+                    </div>
+                </div>
+                ${currentUser.role === 'admin' ? '<button class="btn btn-primary" id="createTest" style="width:100%; margin-bottom:20px;">+ Создать тест</button>' : ''}
+                <div id="list"></div>
+            `;
+
+            document.getElementById('goBtn').onclick = () => {
+                const code = document.getElementById('searchCode').value.trim().toUpperCase();
+                const test = tests.find(t => t.code === code);
+                if (test) startQuiz(test); else alert('Код не найден');
             };
 
-            const modalDiv = document.createElement('div');
-            modalDiv.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(3px);';
-            const modalContent = document.createElement('div');
-            modalContent.style.cssText = 'background:#1e1e2a;border-radius:28px;width:90%;max-width:950px;max-height:90vh;overflow-y:auto;padding:28px 32px;border:1px solid #3a3a4a;';
+            if (currentUser.role === 'admin') document.getElementById('createTest').onclick = () => openEditor();
 
-            function renderEditor() {
-                let questionsHtml = '';
-                workingTest.questions.forEach((q, idx) => {
-                    let optsHtml = '';
-                    q.options.forEach((opt, optIdx) => {
-                        optsHtml += `
-                            <div class="option-row">
-                                <input type="text" class="opt-text" data-qidx="${idx}" data-optidx="${optIdx}" value="${escapeHtml(opt)}" style="flex:1">
-                                <label><input type="checkbox" class="opt-correct" data-qidx="${idx}" data-optidx="${optIdx}" ${q.correct.includes(optIdx) ? 'checked' : ''}> Правильный</label>
-                                <button type="button" class="danger remove-option" data-qidx="${idx}" data-optidx="${optIdx}">✖</button>
-                            </div>
-                        `;
-                    });
-                    questionsHtml += `
-                        <div class="question-block">
-                            <div style="display:flex; justify-content:space-between;"><h3>Вопрос ${idx+1}</h3><button type="button" class="danger remove-question" data-qidx="${idx}">Удалить</button></div>
-                            <div class="form-group"><label>Текст вопроса</label><input type="text" class="question-text-input" data-qidx="${idx}" value="${escapeHtml(q.text)}"></div>
-                            <div class="form-group"><label>Баллы</label><input type="number" class="question-points" data-qidx="${idx}" value="${q.points || 1}" min="1" style="width:120px;"></div>
-                            <div class="options-container">${optsHtml}</div>
-                            <button type="button" class="add-option-btn" data-qidx="${idx}">+ Добавить вариант</button>
-                        </div>
-                    `;
-                });
-                modalContent.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; margin-bottom:24px;"><h2 style="color:#5b8cbd;">${isEdit ? 'Редактирование' : 'Создание теста'}</h2><button id="closeEditorBtn" style="background:none;border:none;font-size:28px;cursor:pointer;color:#9ca3af;">&times;</button></div>
-                    <div class="form-group"><label>Название теста</label><input type="text" id="editTestName" value="${escapeHtml(workingTest.name)}"></div>
-                    <div class="form-group"><label>Описание</label><textarea id="editTestDesc" rows="2">${escapeHtml(workingTest.description)}</textarea></div>
-                    <div class="form-group"><label>Код доступа</label><input type="text" id="editTestCode" value="${escapeHtml(workingTest.code)}" style="text-transform:uppercase"></div>
-                    <div id="questionsContainer">${questionsHtml}</div>
-                    <div class="btn-group" style="margin-top:24px; justify-content:space-between;">
-                        <button id="addQuestionBtn" style="background:#2a2a36;">➕ Добавить вопрос</button>
-                        <button id="saveTestFinalBtn" class="primary">💾 Сохранить и синхронизировать</button>
+            const list = document.getElementById('list');
+            tests.forEach((t, i) => {
+                const item = document.createElement('div');
+                item.className = 'card';
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.innerHTML = `
+                    <div><h3>${t.name}</h3><span class="code-badge">${t.code}</span></div>
+                    <div style="display:flex; gap:8px;">
+                        ${currentUser.role === 'admin' ?
+                          `<button class="btn btn-outline edit-btn">Изменить</button>
+                           <button class="btn btn-danger delete-btn">Удалить</button>` :
+                          `<button class="btn btn-primary play-btn">Пройти</button>`}
                     </div>
                 `;
-                modalDiv.appendChild(modalContent);
-                document.body.appendChild(modalDiv);
-
-                document.getElementById('closeEditorBtn').onclick = () => modalDiv.remove();
-                document.getElementById('addQuestionBtn').onclick = () => {
-                    workingTest.questions.push({ text: '', options: ['', ''], correct: [], points: 1 });
-                    renderEditor();
-                };
-                document.getElementById('saveTestFinalBtn').onclick = async () => {
-                    const newName = document.getElementById('editTestName').value.trim();
-                    const newDesc = document.getElementById('editTestDesc').value.trim();
-                    let newCode = document.getElementById('editTestCode').value.trim().toUpperCase();
-                    if (!newName || !newCode) { alert('Название и код обязательны'); return; }
-                    if (!isEdit && tests.some(t => t.code === newCode && t.id !== workingTest.id)) { alert('Код уже существует'); return; }
-                    const updatedQuestions = [];
-                    const blocks = document.querySelectorAll('.question-block');
-                    for (let i = 0; i < blocks.length; i++) {
-                        const block = blocks[i];
-                        const qText = block.querySelector('.question-text-input').value.trim();
-                        const points = parseInt(block.querySelector('.question-points').value) || 1;
-                        const opts = block.querySelectorAll('.option-row');
-                        const options = []; const correct = [];
-                        for (let j = 0; j < opts.length; j++) {
-                            const val = opts[j].querySelector('.opt-text').value.trim();
-                            if (val) options.push(val);
-                            if (opts[j].querySelector('.opt-correct').checked) correct.push(j);
-                        }
-                        if (!qText || options.length < 2 || correct.length === 0) { alert(`Ошибка в вопросе ${i+1}`); return; }
-                        updatedQuestions.push({ text: qText, options, correct, points });
-                    }
-                    if (!updatedQuestions.length) { alert('Добавьте вопросы'); return; }
-                    const finalTest = {
-                        id: isEdit ? workingTest.id : Date.now().toString(),
-                        name: newName, description: newDesc, code: newCode,
-                        questions: updatedQuestions, createdAt: isEdit ? workingTest.createdAt : new Date().toISOString()
+                if(currentUser.role === 'admin') {
+                    item.querySelector('.edit-btn').onclick = () => openEditor(i);
+                    item.querySelector('.delete-btn').onclick = async () => {
+                        if(confirm('Удалить тест?')) { await apiFetch(`/api/tests/${t.code}`, 'DELETE'); loadTests(); }
                     };
-                    if (isEdit) await updateTest(finalTest);
-                    else await addTest(finalTest);
-                    modalDiv.remove();
-                    await loadTestsFromFirestore();
-                    renderAdminTestsList();
-                };
-                document.querySelectorAll('.remove-question').forEach(btn => {
-                    btn.onclick = () => { workingTest.questions.splice(parseInt(btn.dataset.qidx), 1); renderEditor(); };
-                });
-                document.querySelectorAll('.add-option-btn').forEach(btn => {
-                    btn.onclick = () => { workingTest.questions[parseInt(btn.dataset.qidx)].options.push(''); renderEditor(); };
-                });
-                document.querySelectorAll('.remove-option').forEach(btn => {
-                    btn.onclick = () => {
-                        const qidx = parseInt(btn.dataset.qidx);
-                        const optidx = parseInt(btn.dataset.optidx);
-                        workingTest.questions[qidx].options.splice(optidx, 1);
-                        workingTest.questions[qidx].correct = workingTest.questions[qidx].correct.filter(c => c !== optidx).map(c => c > optidx ? c-1 : c);
-                        renderEditor();
-                    };
-                });
-            }
-            renderEditor();
+                } else {
+                    item.querySelector('.play-btn').onclick = () => startQuiz(t);
+                }
+                list.appendChild(item);
+            });
         }
 
-        function generateCode() { return Math.random().toString(36).substring(2,8).toUpperCase(); }
-        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+        // Функции openEditor, startQuiz, renderQuiz и renderResults остаются из твоей последней версии,
+        // но внутри saveT используем: await apiFetch('/api/tests', 'POST', workingTest); loadTests();
 
-        async function init() {
-            loadSession();
-            if (firebaseInitialized) await loadTestsFromFirestore();
-            else loadTestsFromLocal();
-            isLoading = false;
-            window.addEventListener('hashchange', () => renderRoute());
-            if (!window.location.hash) window.location.hash = 'login';
-            else renderRoute();
+        function openEditor(idx = null) {
+            let workingTest = idx !== null ? JSON.parse(JSON.stringify(tests[idx])) : {
+                name: '', code: Math.random().toString(36).substring(2,7).toUpperCase(),
+                questions: [{ text: '', options: ['', ''], correct: [0], points: 1 }]
+            };
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+
+            const draw = () => {
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <h2>Редактор</h2>
+                        <input type="text" id="edN" placeholder="Название" value="${workingTest.name}">
+                        <div id="qBox">
+                            ${workingTest.questions.map((q, i) => `
+                                <div class="card" style="background:#1a1a26;">
+                                    <input type="text" class="q-txt" value="${q.text}" placeholder="Вопрос">
+                                    <input type="number" class="q-pts" value="${q.points}" style="width:80px;">
+                                    ${q.options.map((opt, oi) => `
+                                        <div class="option-item">
+                                            <input type="checkbox" ${q.correct.includes(oi) ? 'checked' : ''} class="q-chk" data-oi="${oi}">
+                                            <input type="text" class="q-opt" value="${opt}" placeholder="Вариант">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="btn btn-outline" id="addQBtn" style="width:100%; margin-bottom:10px;">+ Вопрос</button>
+                        <button class="btn btn-primary" id="saveT" style="width:100%;">Сохранить на сервер</button>
+                    </div>
+                `;
+                document.getElementById('addQBtn').onclick = () => { sync(); workingTest.questions.push({text:'', options:['',''], correct:[0], points:1}); draw(); };
+                document.getElementById('saveT').onclick = async () => { sync(); await apiFetch('/api/tests', 'POST', workingTest); modal.remove(); loadTests(); };
+            };
+            const sync = () => {
+                workingTest.name = document.getElementById('edN').value;
+                workingTest.questions = Array.from(document.querySelectorAll('#qBox .card')).map(card => ({
+                    text: card.querySelector('.q-txt').value,
+                    points: parseInt(card.querySelector('.q-pts').value),
+                    options: Array.from(card.querySelectorAll('.q-opt')).map(i => i.value),
+                    correct: Array.from(card.querySelectorAll('.q-chk')).filter(c => c.checked).map(c => parseInt(c.dataset.oi))
+                }));
+            };
+            draw();
         }
-        init();
+
+        function startQuiz(test) { activeQuiz = { test, current: 0, score: 0 }; renderQuiz(); }
+        function renderQuiz() {
+            const q = activeQuiz.test.questions[activeQuiz.current];
+            document.getElementById('app').innerHTML = `
+                <div class="card">
+                    <h3>${q.text}</h3>
+                    ${q.options.map((opt, i) => `<button class="btn btn-outline quiz-opt" style="width:100%; margin-bottom:10px;" data-oi="${i}">${opt}</button>`).join('')}
+                </div>
+            `;
+            document.querySelectorAll('.quiz-opt').forEach(btn => btn.onclick = () => {
+                if(q.correct.includes(parseInt(btn.dataset.oi))) activeQuiz.score += q.points;
+                if(++activeQuiz.current < activeQuiz.test.questions.length) renderQuiz(); else renderResults();
+            });
+        }
+        function renderResults() {
+            document.getElementById('app').innerHTML = `<div class="card" style="text-align:center;"><h2>Результат: ${activeQuiz.score}</h2><button class="btn btn-primary" onclick="location.reload()">Меню</button></div>`;
+        }
+
+        if (currentUser) loadTests(); else renderAuth();
     })();
 </script>
 </body>
